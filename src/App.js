@@ -37,7 +37,7 @@ class App extends Component {
             songs={this.state.songlist}
             makeSongs={this.makeSongs}
             handleClick={this.handleClick}
-            getSong={this.getSong}
+            addToQueue={this.addToQueue}
           />
           <Controls
             isPaused={this.state.isPaused}
@@ -62,6 +62,13 @@ class App extends Component {
         <MediaSession
           title={this.state.song && this.state.song.title}
           artist="RuneScape Original Soundtrack"
+          artwork={[
+            {
+              src: './album_cover.jpg',
+              sizes: '640x640',
+              type: 'image/jpg'
+            }
+          ]}
           onPlay={this.audio.play}
           onPause={this.audio.pause}
           onNextTrack={this.skip}
@@ -158,19 +165,6 @@ class App extends Component {
       navigator.mediaSession.setActionHandler('pause', this.playPause);
       navigator.mediaSession.setActionHandler('nexttrack', this.skip);
     }
-  }
-
-  makeSongs = (song) => {
-
-    let elem = (
-      <Song 
-        song={song}
-        handleClick={this.handleClick}
-        addToQueue={this.addToQueue}
-      />
-    );
-
-    return(elem);
   }
 
   // file fetching logic

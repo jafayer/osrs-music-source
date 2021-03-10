@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class ContextMenu extends Component {
     state = { }
     render() {
-
+        console.log(this.props);
         return ( 
             <div className="contextMenu" style={{"top": this.props.y, "left": this.props.x}}>
                 <div className="header">
