@@ -1,0 +1,180 @@
+:root {
+    --green: #0dc10d;
+    --orange: #ff981f;
+    --red: #8f2320;
+    --grey: #5e5f59;
+    --cyan: #11fafa;
+    --yellow: #f1ff18;
+}
+
+
+body, html {
+    font-family: monospace;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+body {
+    background: url('./img/page-wrap.jpg') repeat-y center top, #000;
+}
+
+.wrap {
+    max-width: 815px;
+    margin: 0 auto;
+    padding: 50px 0px;
+}
+
+.player {
+    width: 80%;
+    max-width: 350px;
+    background: url('./img/outer-background.jpg');
+    background-size: 100% 100%;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+
+.modeSelect {
+    text-align: right;
+}
+.modeSelect button, .playPause {
+    background: url('./img/button.png');
+    background-size: 100% 100%;
+    color: var(--orange);
+    position: relative;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    display: inline-table;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.modeSelect button:focus {
+    border-style: inset;
+}
+
+.modeSelect button p, .playPause p {
+    padding: 0;
+    margin: 0;
+    width: 75px;
+    height: 50px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.modeSelect button.active p {
+    background: #d612126e;
+}
+
+.playing {
+    color: var(--orange);
+    margin: 10px auto;
+    padding: 0px 15px;
+}
+
+.playing span {
+    color: var(--green);
+}
+.songs {
+    background: url('./img/border-background.jpg');
+    background-size: 100% 100%;
+    padding: 12px;
+}
+
+
+.player ul {
+    height: 345px;
+    overflow-y: scroll;
+    list-style-type: none;
+    margin: 0;
+    padding: 15px;   
+}
+
+.player ul a {
+    text-decoration: none;
+}
+.player ul li {
+    margin: 5px 0px;
+    padding: 0;
+    color: var(--green);
+    cursor: pointer;
+}
+
+.player ul li p {
+    margin: 0;
+}
+
+.contextMenu {
+    position: absolute;
+    padding: 0;
+    background-color: var(--grey);
+    height: unset;
+}
+
+.contextMenu .header {
+    margin: 0px;
+    background: #000;
+    color: var(--grey);
+}
+
+.contextMenu .header p {
+    margin: 0;
+    padding: 0;
+}
+.contextMenu ul {
+    border: 2px solid #000;
+    list-style-type: none;
+    margin: 0;
+    padding: 2px 3px;
+    height: unset;
+    overflow: auto;
+}
+
+.contextMenu ul li {
+    margin: 0 !important;
+    padding: 0;
+    color: #fff;
+    height: unset;
+}
+
+.contextMenu ul li:hover {
+    color: var(--yellow);
+}
+
+.contextMenu ul li span {
+    color: var(--cyan);
+}
+.controls {
+    text-align: center;
+}
+.controls button {
+    text-align: center;
+    margin: 15px auto;
+}
+
+.upNext ul {
+    list-style-type: none;
+    margin: 15px auto;
+    display: block;
+    max-width: 600px;
+    width: 80%;
+    text-align: center;
+    padding: 0;
+}
+.upNext h1 {
+    color: var(--orange);
+    text-align: center;
+}
+.upNext ul li {
+    color: var(--green);
+    cursor: pointer;
+}
+
+
+.instructions {
+    color: var(--red);
+    font-style: italic;
+    text-align: center;
+}
