@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 
 class ContextMenu extends Component {
     state = { }
-    render() { 
+    render() {
+
         return ( 
             <div className="contextMenu" style={{"top": this.props.y, "left": this.props.x}}>
                 <div className="header">
@@ -27,7 +28,7 @@ class ContextMenu extends Component {
 
     play = (e,song) => {
         e.preventDefault();
-        this.props.handleClick(null,this.props.song);
+        this.props.handleClick(null,song);
     }
 
     addToQueue = (e, song) => {

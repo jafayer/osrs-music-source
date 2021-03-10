@@ -5,6 +5,8 @@ import Controls from './components/controls';
 import Song from './components/song';
 import './App.css';
 import data from './data.json';
+import AudioWrapper from './resources/audiowrapper';
+import MediaSession from '@mebtte/react-media-session';
 import {
   BrowserRouter as Router,
   Switch,
@@ -16,6 +18,7 @@ class App extends Component {
   state = {
     isPaused: true,
     mode: "auto",
+    song: null,
     manualQueue: [],
     standardQueue: [
       {"filename":"Harmony.ogg","url":"https://archive.org/download/OldRunescapeSoundtrack/Harmony.ogg","id":"160","title":"Harmony"},
@@ -56,13 +59,21 @@ class App extends Component {
 
         <p className="instructions">Press ctrl+click to add a song to the queue!</p>
         <p className="instructions">Click a song in the queue to remove it!</p>
+        <MediaSession
+          title={this.state.song && this.state.song.title}
+          artist="RuneScape Original Soundtrack"
+          onPlay={this.audio.play}
+          onPause={this.audio.pause}
+          onNextTrack={this.skip}
+        >
+          children or null
+        </MediaSession>;
       </div>
     );
   }
 
-  audio;
-
   // init logic
+  audio = new AudioWrapper();
 
   getActiveQueue = (mode) => {
     let map = {
@@ -75,8 +86,8 @@ class App extends Component {
 
   componentDidMount = () => {
 
-    this.audio = new Audio();
-    this.audio.onended = this.ended;
+    this.audio = new AudioWrapper();
+    this.audio.audio.onended = this.ended;
 
     this.setState({songlist: data.songs}, () => {
       console.log(this.state.songslist)
@@ -91,7 +102,7 @@ class App extends Component {
       }
     });
 
-    this.audio.addEventListener('play', () => {
+    this.audio.audio.addEventListener('play', () => {
       this.setState({
         isPaused: false
       }, () => {
@@ -99,11 +110,18 @@ class App extends Component {
       });
     });
 
-    this.audio.addEventListener('pause', () => {
+    this.audio.audio.addEventListener('pause', () => {
       this.setState({
         isPaused: true
       }, () => {
         console.log("Paused!");
+      });
+    });
+
+    this.audio.audio.addEventListener('loadeddata', () => {
+      this.setState({song: this.audio.song}, () => {
+        document.title = "RuneScape Music Player - " + this.state.song.title;
+        console.log(this.state.song);
       });
     });
 
@@ -170,7 +188,7 @@ class App extends Component {
   handleClick = (event, song) => {
     if(event) { // if handleClick occurred from click event, check if should add to queue
       if(this.state.mode !== "loop" && (event.ctrlKey || event.metaKey)) { // if ctrl/cmd, add to queue
-
+        event.preventDefault();
         this.addToQueue(song);
   
         return;
@@ -184,7 +202,7 @@ class App extends Component {
     const url = song.url;
     console.log(url);
 
-    this.audio.src = url;
+    this.audio.setSong(song);
     
     this.setState({
       playing: song,
@@ -200,7 +218,8 @@ class App extends Component {
     let queue = this.state[activeQueue].slice();
 
     if(queue.length === 0) {
-      this.audio.src = "";
+      this.audio.song = null;
+      this.audio.pause();
       this.setState({
         isPaused: true
       });
@@ -219,7 +238,7 @@ class App extends Component {
   playPause = () => {
 
     if(this.state.isPaused) {
-      if(this.audio.src === "" && this.state.mode !== "loop") { // advance to next song if there's a queue and no current track
+      if(this.audio.getSrc() === "" && this.state.mode !== "loop") { // advance to next song if there's a queue and no current track
 
         let activeQueue = this.getActiveQueue(this.state.mode);
 
@@ -255,9 +274,9 @@ class App extends Component {
   modeSelect = (mode, clicked=true) => {
 
     if(mode === "loop") { 
-      this.audio.loop = true;
+      this.audio.audio.loop = true;
     } else { // make sure loop is false if previously declared
-      this.audio.loop = false;
+      this.audio.audio.loop = false;
     }
 
     this.setState({

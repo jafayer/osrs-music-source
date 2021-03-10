@@ -11,14 +11,14 @@ import {
 
 class Song extends Component {
     state = { 
-        contextMenu: null
+        contextMenu: false
      }
 
     render() {
         return (
             <>
                 <div>
-                    {(this.state.contextMenu && this.state.contextMenu)}
+                    {(this.state.contextMenu && this.addPopup())}
                 </div>
                 
                 <Link to={this.props.song.title.replaceAll(" ","_")} onContextMenu={(e) => {this.contextMenu(e)}}>
@@ -30,33 +30,40 @@ class Song extends Component {
         );
     }
 
-    addPopup = (x,y) => {
+    addPopup = () => {
         if(this.state.contextMenu) {
-            this.closeMenu();
-        }
+            let menu = (<ContextMenu
+                x={this.state.x}
+                y={this.state.y}
+                click={this.closeMenu}
+                song={this.props.song}
+                handleClick={this.props.handleClick}
+                addToQueue={this.props.addToQueue}
+                close={this.closeMenu}
+            />);
 
-        let menu = (<ContextMenu
-            x={x}
-            y={y}
-            click={this.closeMenu}
-            song={this.props.song}
-            handleClick={this.props.handleClick}
-            addToQueue={this.props.addToQueue}
-            close={this.closeMenu}
-        />);
-        this.setState({
-            contextMenu: null,
-            contextMenu: menu
-        });
+            return(menu)
+        }
     } 
 
     closeMenu = () => {
-        this.setState({contextMenu: null});
+        this.setState({
+            contextMenu: false,
+            x: null,
+            y: null
+        });
     }
 
     contextMenu = (e) => {
         e.preventDefault();
-        this.addPopup(e.pageX, e.pageY);
+        this.closeMenu();
+        this.setState({
+            contextMenu: true,
+            x: e.pageX,
+            y: e.pageY
+        }, () => {
+            this.addPopup(e.pageX, e.pageY);
+        });  
     }
 }
  
