@@ -10,10 +10,7 @@
 
 @font-face {
     font-family: "RuneScape";
-    src:     
-         url('./resources/RuneScape.woff2') format('woff2'),
-         url('./resources/RuneScape.woff') format('woff'),
-         url('./resources/RuneScape.ttf') format('truetype');
+    src: url('./resources/RuneScape.ttf') format('truetype');
 }
 
 
