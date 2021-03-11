@@ -51,11 +51,6 @@ class App extends Component {
             removeFromQueue={this.removeFromQueue}
           />
         </div>
-        <button onClick={() => {console.log(this.audio)}}>Check Audio</button>
-        <button onClick={() => {console.log(this.state)}}>Check state</button>
-        <button onClick={() => {console.log(this.props)}}>Check props</button>
-        <button onClick={() => {console.log(this.audio.paused)}}>Is paused?</button>
-        <button onClick={() => {this.audio.play()}}>Is paused?</button>
 
         <p className="instructions">Press ctrl+click to add a song to the queue!</p>
         <p className="instructions">Click a song in the queue to remove it!</p>
