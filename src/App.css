@@ -5,6 +5,7 @@
     --grey: #5e5f59;
     --cyan: #11fafa;
     --yellow: #f1ff18;
+    --white: #ffffff;
 }
 
 @font-face {
@@ -103,11 +104,16 @@ body {
 .player ul a {
     text-decoration: none;
 }
+
 .player ul li {
-    margin: 5px 0px;
+    margin: 0;
     padding: 0;
     color: var(--green);
     cursor: pointer;
+}
+
+.player ul li:hover {
+    color: var(--white)
 }
 
 .player ul li p {
