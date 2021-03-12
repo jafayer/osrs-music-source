@@ -95,6 +95,21 @@ class App extends Component {
       console.log(this.state.songslist)
     });
 
+    this.props.history.listen((route) => {
+      console.log(this.props.history);
+      let path = route.pathname.split('/')[1];
+      let decoded = path.replaceAll("_"," ");
+      let song = data.songs.find(i => i.title.toLowerCase() === decoded.toLowerCase());
+      if(song) {
+        if(this.state.song) {
+          if(song.title != this.state.song.title) {
+            this.loadedFromUrlChange = true;
+            this.handleClick(null,song);
+          }
+        }
+      }
+    });
+
     document.addEventListener('keydown', e => {
       if(e.code === "Space") {
         e.preventDefault();
@@ -123,13 +138,17 @@ class App extends Component {
     this.audio.audio.addEventListener('loadeddata', () => {
       this.setState({song: this.audio.song}, () => {
         document.title = "RuneScape Music Player - " + this.state.song.title;
-        console.log(this.state.song);
+        if(!this.loadedFromUrlChange) {
+          this.props.history.push('/' + this.state.song.title.replaceAll(" ","_"));
+        } else {
+          this.loadedFromUrlChange = null;
+        }
+
       });
     });
 
     if(this.props.match) {
       let match = this.props.match.params.song.replaceAll("_"," ");
-      console.log(match);
       let song = data.songs.find(i => i.title.toLowerCase() === match.toLowerCase());
       if(song) {
         this.handleClick(null,song);
