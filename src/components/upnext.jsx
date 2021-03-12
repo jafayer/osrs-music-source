@@ -21,7 +21,15 @@ class UpNext extends Component {
         let arr = [];
         for(let i = 0; i < queue.length; i++) {
             let elem = (
-                <li key={i} onClick={() => {this.props.removeFromQueue(i)}}>
+                <li key={i} onClick={(e) => {
+                    if(e.ctrlKey || e.metaKey) { // if ctrl/cmd, add to queue
+                        this.props.removeFromQueue(i)
+                    } else {
+                        e.preventDefault();
+                        this.props.handleClick(null,queue[i]);
+                        this.props.removeFromQueue(i)
+                    }
+                }}>
                     {queue[i].title}
                 </li>
             );

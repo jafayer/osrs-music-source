@@ -9,14 +9,18 @@
 }
 
 @font-face {
-    font-family: "RuneScape";
-    src: url('./resources/RuneScape.ttf') format('truetype');
+    font-family:"Runescape Chat Font Regular";
+    src: url("./resources/font/runescape_chat_font.eot?") format("eot"),
+         url("./resources/font/runescape_chat_font.woff") format("woff"),
+         url("./resources/font/runescape_chat_font.ttf") format("truetype"),
+        url("./resources/font/runescape_chat_font.svg#Runescape-Chat-Font") format("svg");
+    font-weight:normal;font-style:normal;
 }
 
 
 body, html {
-    font-family: 'RuneScape',monospace;
-    font-size: 24px;
+    font-family: 'Runescape Chat Font Regular',monospace;
+    font-size: 22px;
     text-shadow: 1px 1px #000;
     padding: 0;
     margin: 0;
@@ -56,7 +60,7 @@ body {
     display: inline-table;
     cursor: pointer;
     text-transform: uppercase;
-    font-family: 'RuneScape', monospace;
+    font-family: 'Runescape Chat Font Regular', monospace;
     font-size: 25px;
 }
 

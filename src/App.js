@@ -49,6 +49,7 @@ class App extends Component {
             standardQueue={this.state.standardQueue}
             manualQueue={this.state.manualQueue}
             removeFromQueue={this.removeFromQueue}
+            handleClick={this.handleClick}
           />
         </div>
 
