@@ -331,7 +331,7 @@ class App extends Component {
       path = this.state.playing.title.replace(' ', '_');
     }
     let queue = this.state[this.getActiveQueue(this.state.mode)].slice();
-    let resQueue = queue.map(song => song.title.replace(' ','_'));
+    let resQueue = queue.map(song => song.title.replaceAll(' ','_'));
     let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "");
 
     navigator.clipboard.writeText(url).then(() => {
