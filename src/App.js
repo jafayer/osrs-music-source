@@ -12,11 +12,7 @@ class App extends Component {
     isPaused: true,
     mode: "auto",
     manualQueue: [],
-    standardQueue: [
-      {"filename":"Harmony.ogg","url":"https://archive.org/download/OldRunescapeSoundtrack/Harmony.ogg","id":"160","title":"Harmony"},
-      {"filename":"Adventure.ogg","url":"https://archive.org/download/OldRunescapeSoundtrack/Adventure.ogg","id":"1","title":"Adventure"},
-      {"filename":"Autumn Voyage.ogg","url":"https://archive.org/download/OldRunescapeSoundtrack/Autumn%20Voyage.ogg","id":"21","title":"Autumn Voyage"},
-      {"filename":"Camelot.ogg","url":"https://archive.org/download/OldRunescapeSoundtrack/Camelot.ogg","id":"45","title":"Camelot"}]
+    standardQueue: []
    }
   render() {
     return (
@@ -84,8 +80,9 @@ class App extends Component {
     this.audio = new AudioWrapper();
     this.audio.audio.onended = this.ended;
 
-    this.setState({songlist: data.songs}, () => {
-      console.log(this.state.songslist)
+    this.setState({
+      songlist: data.songs,
+      standardQueue: data.queue
     });
 
     this.props.history.listen((route) => {
@@ -329,10 +326,13 @@ class App extends Component {
 
   copyToClipboard = () => {
     let baseurl = "https://runetunes.com/";
-    let path = this.state.playing.title.replace(' ', '_');
+    let path;
+    if(this.state.playing) {
+      path = this.state.playing.title.replace(' ', '_');
+    }
     let queue = this.state[this.getActiveQueue(this.state.mode)].slice();
     let resQueue = queue.map(song => song.title.replace(' ','_'));
-    let url = baseurl+path+"?queue="+resQueue.join(",");
+    let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "");
 
     navigator.clipboard.writeText(url).then(() => {
       console.log("wrote to clipboard: " + url);
