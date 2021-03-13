@@ -11,6 +11,11 @@
       "src": "favicon.png",
       "type": "image/png",
       "sizes": "37x37"
+    },
+    {
+      "src": "cape.png",
+      "type": "image/png",
+      "sizes": "640x640 419x419"
     }
   ],
   "start_url": ".",
