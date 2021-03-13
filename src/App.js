@@ -69,7 +69,6 @@ class App extends Component {
           onPause={this.audio.pause}
           onNextTrack={this.skip}
         >
-          children or null
         </MediaSession>;
       </div>
     );
