@@ -11,11 +11,6 @@
       "src": "favicon.png",
       "type": "image/png",
       "sizes": "37x37"
-    },
-    {
-      "src": "album_cover.jpg",
-      "type": "image/jpg",
-      "sizes": "640x640"
     }
   ],
   "start_url": ".",
