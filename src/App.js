@@ -2,23 +2,15 @@ import React, { Component } from 'react';
 import Player from './components/player';
 import UpNext from './components/upnext';
 import Controls from './components/controls';
-import Song from './components/song';
 import './App.css';
 import data from './data.json';
 import AudioWrapper from './resources/audiowrapper';
 import MediaSession from '@mebtte/react-media-session';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
 
 class App extends Component {
   state = {
     isPaused: true,
     mode: "auto",
-    song: null,
     manualQueue: [],
     standardQueue: [
       {"filename":"Harmony.ogg","url":"https://archive.org/download/OldRunescapeSoundtrack/Harmony.ogg","id":"160","title":"Harmony"},
@@ -50,6 +42,7 @@ class App extends Component {
             manualQueue={this.state.manualQueue}
             removeFromQueue={this.removeFromQueue}
             handleClick={this.handleClick}
+            copy={this.copyToClipboard}
           />
         </div>
 
@@ -102,7 +95,7 @@ class App extends Component {
       let song = data.songs.find(i => i.title.toLowerCase() === decoded.toLowerCase());
       if(song) {
         if(this.state.song) {
-          if(song.title != this.state.song.title) {
+          if(song.title !== this.state.song.title) {
             this.loadedFromUrlChange = true;
             this.handleClick(null,song);
           }
@@ -332,6 +325,19 @@ class App extends Component {
         album: 'RuneScape Original Soundtrack'
       });
     }
+  }
+
+  copyToClipboard = () => {
+    let baseurl = "https://runetunes.com/";
+    let path = this.state.playing.title.replace(' ', '_');
+    let queue = this.state[this.getActiveQueue(this.state.mode)].slice();
+    let resQueue = queue.map(song => song.title.replace(' ','_'));
+    let url = baseurl+path+"?queue="+resQueue.join(",");
+
+    navigator.clipboard.writeText(url).then(() => {
+      console.log("wrote to clipboard: " + url);
+    });
+
   }
 }
 

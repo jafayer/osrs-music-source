@@ -7,7 +7,7 @@ class Controls extends Component {
 
             <div className="controls">
                 <button className="playPause" onClick={this.props.playPause}><p className="material-icons">{this.props.isPaused ? "play_arrow" : "pause"}</p></button>
-                <button className="playPause" onClick={this.props.skip}><p className="material-icons">skip_next</p></button>
+                <button className="button" onClick={this.props.skip}><p className="material-icons">skip_next</p></button>
             </div>
         );
     }

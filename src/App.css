@@ -8,6 +8,22 @@
     --white: #ffffff;
 }
 
+@keyframes glow3 {
+    0%{
+      color: #FFFFFF;
+    } 25%{
+      color: #00B000;
+    } 50% {
+      color: #FFFFFF;
+    } 67.5%{
+      color: #00FFFF;
+    } 75% {
+      color: #0000FF;
+    } 100% {
+      color: #FFFFFF;
+    }
+}
+
 @font-face {
     font-family:"Runescape Chat Font Regular";
     src: url("./resources/font/runescape_chat_font.eot?") format("eot"),
@@ -49,7 +65,7 @@ body {
 .modeSelect {
     text-align: right;
 }
-.modeSelect button, .playPause {
+.modeSelect button, .playPause, .button {
     background: url('./img/button.png');
     background-size: 100% 100%;
     color: var(--orange);
@@ -68,7 +84,7 @@ body {
     border-style: inset;
 }
 
-.modeSelect button p, .playPause p {
+.modeSelect button p, .playPause p, .button p {
     padding: 0;
     margin: 0;
     width: 75px;
@@ -184,13 +200,34 @@ body {
     text-align: center;
     padding: 0;
 }
+
+.upNext .copy {
+    width: 200px;
+    color: var(--cyan);
+    cursor: pointer;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.upNext .copy:hover {
+    animation: glow3 5s infinite;
+}
+
+.upNext .copy .material-icons {
+    font-size: inherit;
+    vertical-align: middle;
+}
+
 .upNext h1 {
     color: var(--orange);
     text-align: center;
+    margin-bottom: 0px;
 }
 .upNext ul li {
     color: var(--green);
     cursor: pointer;
+    width: fit-content;
+    margin: 0 auto;
 }
 
 

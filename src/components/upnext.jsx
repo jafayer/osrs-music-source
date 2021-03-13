@@ -9,6 +9,7 @@ class UpNext extends Component {
         return (
             <div className="upNext">
                 <h1>Up Next:</h1>
+                <p className="copy" onClick={this.props.copy}>Copy link to queue <span className="material-icons">content_copy</span></p>
                 <ul>
                     {this.props.mode === "auto" && this.makeUpNext(this.props.standardQueue)}
                     {this.props.mode === "manual" && this.makeUpNext(this.props.manualQueue)}

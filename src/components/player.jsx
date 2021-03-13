@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
 import Song from './song';
 import ContextMenu from './contextmenu';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link
-  } from "react-router-dom";
 
 class Player extends Component {
     state = { 
