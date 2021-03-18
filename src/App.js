@@ -45,9 +45,6 @@ class App extends Component {
             copy={this.copyToClipboard}
           />
         </div>
-
-        <p className="instructions">Press ctrl+click to add a song to the queue!</p>
-        <p className="instructions">Click a song in the queue to remove it!</p>
         <MediaSession
           isPaused={this.state.isPaused}
           audio={this.audio}
