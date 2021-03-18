@@ -30,7 +30,9 @@ class UpNext extends Component {
                         this.props.handleClick(null,queue[i]);
                         this.props.removeFromQueue(i)
                     }
-                }}>
+                }}
+                
+                li onContextMenu={(e) => {e.preventDefault(); this.props.removeFromQueue(i)}}>
                     {queue[i].title}
                 </li>
             );

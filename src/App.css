@@ -8,6 +8,11 @@
     --white: #ffffff;
 }
 
+@keyframes spinner {
+    from {transform: rotate(0deg)}
+    to {transform: rotate(360deg)}
+}
+
 @keyframes glow3 {
     0%{
       color: #FFFFFF;
@@ -80,6 +85,13 @@ body {
     font-size: 25px;
 }
 
+.playPause.loading p {
+    animation-name: spinner;
+    animation-duration: .5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: forwards;
+}
 .modeSelect button:focus {
     border-style: inset;
 }

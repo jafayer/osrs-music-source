@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 import Player from './components/player';
 import UpNext from './components/upnext';
 import Controls from './components/controls';
+import MediaSession from './components/mediaSession';
 import './App.css';
 import data from './data.json';
 import AudioWrapper from './resources/audiowrapper';
-import MediaSession from '@mebtte/react-media-session';
+
+// import MediaSession from '@mebtte/react-media-session';
 
 class App extends Component {
   state = {
+    loading: false,
     isPaused: true,
     mode: "auto",
     manualQueue: [],
@@ -31,6 +34,7 @@ class App extends Component {
             isPaused={this.state.isPaused}
             playPause={this.playPause}
             skip={this.skip}
+            loading={this.state.loading}
           />
           <UpNext
             mode={this.state.mode}
@@ -45,26 +49,30 @@ class App extends Component {
         <p className="instructions">Press ctrl+click to add a song to the queue!</p>
         <p className="instructions">Click a song in the queue to remove it!</p>
         <MediaSession
-          title={this.state.song && this.state.song.title}
-          artist="RuneScape Original Soundtrack"
-          artwork={[
-            {
-              src: './album_cover.jpg',
-              sizes: '640x640',
-              type: 'image/jpg'
-            }
-          ]}
+          isPaused={this.state.isPaused}
+          audio={this.audio}
+          song={this.state.song && this.state.song}
           onPlay={this.audio.play}
           onPause={this.audio.pause}
           onNextTrack={this.skip}
-        >
-        </MediaSession>;
+
+        />
       </div>
     );
   }
 
   // init logic
   audio = new AudioWrapper();
+  metadata = new window.MediaMetadata({
+    artwork: [
+      {
+        src: './album_cover.jpg',
+        sizes: '640x640',
+        type: 'image/jpg'
+      }
+    ],
+    artist: "RuneScape Original Soundtrack"
+  });
 
   getActiveQueue = (mode) => {
     let map = {
@@ -77,7 +85,6 @@ class App extends Component {
 
   componentDidMount = () => {
 
-    this.audio = new AudioWrapper();
     this.audio.audio.onended = this.ended;
 
     this.setState({
@@ -125,15 +132,15 @@ class App extends Component {
       });
     });
 
-    this.audio.audio.addEventListener('loadeddata', () => {
-      this.setState({song: this.audio.song}, () => {
+    this.audio.audio.addEventListener('canplay', () => {
+      this.setState({song: this.audio.song, loading: false}, () => {
         document.title = "RuneScape Music Player - " + this.state.song.title;
         if(!this.loadedFromUrlChange) {
           this.props.history.push('/' + this.state.song.title.replaceAll(" ","_"));
         } else {
           this.loadedFromUrlChange = null;
         }
-
+        document.querySelector('.playPause').classList.remove('loading');
       });
     });
 
@@ -201,9 +208,11 @@ class App extends Component {
     console.log(url);
 
     this.audio.setSong(song);
+    document.querySelector('.playPause').classList.add('loading');
     
     this.setState({
       playing: song,
+      loading: true
     }, () => {
       this.audio.play();
     });
