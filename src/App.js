@@ -6,6 +6,7 @@ import MediaSession from './components/mediaSession';
 import './App.css';
 import data from './data.json';
 import AudioWrapper from './resources/audiowrapper';
+import Instructions from './components/instructions';
 
 // import MediaSession from '@mebtte/react-media-session';
 
@@ -44,6 +45,7 @@ class App extends Component {
             handleClick={this.handleClick}
             copy={this.copyToClipboard}
           />
+          <Instructions />
         </div>
         <MediaSession
           isPaused={this.state.isPaused}

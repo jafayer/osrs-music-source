@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Swipe from 'react-easy-swipe';
 
 
 class UpNext extends Component {
@@ -22,19 +23,21 @@ class UpNext extends Component {
         let arr = [];
         for(let i = 0; i < queue.length; i++) {
             let elem = (
-                <li key={i} onClick={(e) => {
-                    if(e.ctrlKey || e.metaKey) { // if ctrl/cmd, add to queue
-                        this.props.removeFromQueue(i)
-                    } else {
-                        e.preventDefault();
-                        this.props.handleClick(null,queue[i]);
-                        this.props.removeFromQueue(i)
-                    }
-                }}
-                
-                li onContextMenu={(e) => {e.preventDefault(); this.props.removeFromQueue(i)}}>
-                    {queue[i].title}
-                </li>
+                <Swipe onSwipeRight={() => {this.props.removeFromQueue(i)}} tolerance="80">
+                    <li key={i} onClick={(e) => {
+                        if(e.ctrlKey || e.metaKey) { // if ctrl/cmd, add to queue
+                            this.props.removeFromQueue(i)
+                        } else {
+                            e.preventDefault();
+                            this.props.handleClick(null,queue[i]);
+                            this.props.removeFromQueue(i)
+                        }
+                    }}
+                    
+                    li onContextMenu={(e) => {e.preventDefault(); this.props.removeFromQueue(i)}}>
+                        {queue[i].title}
+                    </li>
+                </Swipe>
             );
 
             arr.push(elem);

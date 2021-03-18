@@ -213,6 +213,11 @@ body {
     padding: 0;
 }
 
+.upNext ul div {
+    width: fit-content;
+    margin: 0 auto;
+}
+
 .upNext .copy {
     width: 200px;
     color: var(--cyan);
@@ -245,6 +250,28 @@ body {
 
 .instructions {
     color: var(--red);
-    font-style: italic;
     text-align: center;
+}
+.instructions h1 {
+    cursor: pointer;
+}
+
+.instructions p {
+    color: var(--white);
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    line-height: 1.2
+}
+
+.instructions p .code {
+    background-color: var(--red);
+    color: var(--white);
+    border-radius: 5px;
+    padding: 0px 5px;
+    font-style: normal;
+    white-space: nowrap;    
+}
+.hidden {
+    display: none;
 }
