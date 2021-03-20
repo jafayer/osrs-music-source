@@ -7,6 +7,8 @@ import './App.css';
 import data from './data.json';
 import AudioWrapper from './resources/audiowrapper';
 import Instructions from './components/instructions';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // import MediaSession from '@mebtte/react-media-session';
 
@@ -46,6 +48,7 @@ class App extends Component {
             copy={this.copyToClipboard}
           />
           <Instructions />
+          <ToastContainer />
         </div>
         <MediaSession
           isPaused={this.state.isPaused}
@@ -72,6 +75,31 @@ class App extends Component {
     ],
     artist: "RuneScape Original Soundtrack"
   });
+
+  success = (message) => {
+    console.log(toast);
+    toast.success(message, {
+      position: "bottom-center",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+  }
+
+  failure = (message) => {
+    toast.error(message, {
+      position: "bottom-center",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+  }
 
   getActiveQueue = (mode) => {
     let map = {
@@ -186,6 +214,10 @@ class App extends Component {
   
     this.setState({
       [activeQueue]: queue
+    }, () => {
+      if('vibrate' in window.navigator) {
+        window.navigator.vibrate(25);
+      }
     });
   }
 
@@ -320,6 +352,10 @@ class App extends Component {
 
     this.setState({
      [activeQueue]: queue 
+    }, () => {
+      if('vibrate' in window.navigator) {
+        window.navigator.vibrate([25,50,25])
+      }
     });
   }
 
@@ -333,19 +369,26 @@ class App extends Component {
   }
 
   copyToClipboard = () => {
-    let baseurl = "https://runetunes.com/";
-    let path;
-    if(this.state.playing) {
-      path = this.state.playing.title.replace(' ', '_');
+    if('clipboard' in window.navigator) {
+      let baseurl = "https://runetunes.com/";
+      let path;
+      if(this.state.playing) {
+        path = this.state.playing.title.replace(' ', '_');
+      }
+      let queue = this.state[this.getActiveQueue(this.state.mode)].slice();
+      let resQueue = queue.map(song => song.title.replaceAll(' ','_'));
+      let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "");
+
+      window.navigator.clipboard.writeText(url).then(() => {
+        console.log("wrote to clipboard: " + url);
+        if('vibrate' in window.navigator) {
+          window.navigator.vibrate(50,50,50);
+          this.success('Copied to clipboard!');
+        }
+      });
+    } else {
+      this.failure('Couldn\'t copy to clipboard!');
     }
-    let queue = this.state[this.getActiveQueue(this.state.mode)].slice();
-    let resQueue = queue.map(song => song.title.replaceAll(' ','_'));
-    let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "");
-
-    navigator.clipboard.writeText(url).then(() => {
-      console.log("wrote to clipboard: " + url);
-    });
-
   }
 }
 

@@ -275,3 +275,20 @@ body {
 .hidden {
     display: none;
 }
+
+.Toastify__toast::before {
+    content: '';
+    background: url('resources/gnome.png');
+    width: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.Toastify__toast--success, .Toastify__toast--error {
+    background-color: #5a5232 !important;
+}
+
+.Toastify__toast-body{
+    font-family: 'Runescape Chat Font Regular',monospace !important;
+    text-align: left;
+}
