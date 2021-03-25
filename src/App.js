@@ -10,8 +10,6 @@ import Instructions from './components/instructions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// import MediaSession from '@mebtte/react-media-session';
-
 class App extends Component {
   state = {
     loading: false,
@@ -65,16 +63,6 @@ class App extends Component {
 
   // init logic
   audio = new AudioWrapper();
-  metadata = new window.MediaMetadata({
-    artwork: [
-      {
-        src: './album_cover.jpg',
-        sizes: '640x640',
-        type: 'image/jpg'
-      }
-    ],
-    artist: "RuneScape Original Soundtrack"
-  });
 
   success = (message) => {
     console.log(toast);

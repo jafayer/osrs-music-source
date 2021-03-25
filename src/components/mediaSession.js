@@ -17,11 +17,11 @@ class MediaSession extends Component {
     mediaSession = this.HAS_MEDIA_SESSION ? window.navigator.mediaSession : null;
 
     updateMetadata = () => {
-        if('MediaMetadata' in window) {
+        if('MediaMetadata' in window && window.MediaMetadata) {
             let mediaMetadata = new window.MediaMetadata({
                 artwork: [
                     {
-                      src: '../album_cover.jpg',
+                      src: 'https://runetunes.com/album_cover.jpg',
                       sizes: '640x640',
                       type: 'image/jpg'
                     }
@@ -61,11 +61,13 @@ class MediaSession extends Component {
         ]
 
         
-        this.mediaSession.setActionHandler('play', () => {this.actionHandlerWrapper(this.props.onPlay)});
-        this.mediaSession.setActionHandler('pause', () => {this.actionHandlerWrapper(this.props.onPause)});
-        this.mediaSession.setActionHandler('nexttrack', () => {this.actionHandlerWrapper(this.props.onNextTrack)});
+        if(this.HAS_MEDIA_SESSION) {
+            this.mediaSession.setActionHandler('play', () => {this.actionHandlerWrapper(this.props.onPlay)});
+            this.mediaSession.setActionHandler('pause', () => {this.actionHandlerWrapper(this.props.onPause)});
+            this.mediaSession.setActionHandler('nexttrack', () => {this.actionHandlerWrapper(this.props.onNextTrack)});
 
-        this.mediaSession.metadata = this.metadata;
+            this.mediaSession.metadata = this.metadata;
+        }
     }
 }
  
