@@ -16,7 +16,8 @@ class App extends Component {
     isPaused: true,
     mode: "auto",
     manualQueue: [],
-    standardQueue: []
+    standardQueue: [],
+    shuffle: false,
    }
   render() {
     return (
@@ -44,6 +45,8 @@ class App extends Component {
             removeFromQueue={this.removeFromQueue}
             handleClick={this.handleClick}
             copy={this.copyToClipboard}
+            shuffle={this.state.shuffle}
+            toggleShuffle={this.toggleShuffle}
           />
           <Instructions />
           <ToastContainer />
@@ -96,6 +99,25 @@ class App extends Component {
     }
 
     return(map[mode]);
+  }
+
+  shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+  
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+  
+    return array;
   }
 
   componentDidMount = () => {
@@ -168,6 +190,8 @@ class App extends Component {
     }
 
     let queryString = new URLSearchParams(this.props.location.search);
+    let isShuffled = queryString.get('shuffle') === "";
+
     if(queryString.get('queue')) {
       let version = queryString.get("v");
       let queue = queryString.get("queue").split(",");
@@ -177,14 +201,26 @@ class App extends Component {
       queue.forEach(song => {
         let insert = data.songs.find(i => i.title.toLowerCase() === song.toLowerCase());
         if(insert) inserts.push(insert);
-      })
+      });
 
-      console.log(inserts);
-  
-      this.setState({mode: "manual"}, () => {
+      if(isShuffled) {
+        inserts = this.shuffle(inserts);
+      }
+
+      this.setState({mode: "manual", shuffle: isShuffled}, () => {
         this.addToQueue.apply(null,inserts);
       })
+    } else {
+      if(isShuffled) {
+        let queue = this.shuffle(data.songs);
+
+        this.setState({mode: 'manual', shuffle: isShuffled}, () => {
+          this.addToQueue.apply(null, queue);
+        });
+      }
     }
+
+    console.log("Shuffled? " + this.state.shuffle);
 
     if('mediasession' in navigator) {
       navigator.mediaSession.setActionHandler('play', this.playPause);
@@ -365,7 +401,7 @@ class App extends Component {
       }
       let queue = this.state[this.getActiveQueue(this.state.mode)].slice();
       let resQueue = queue.map(song => song.title.replaceAll(' ','_'));
-      let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "");
+      let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "") + (this.state.shuffle ? "&shuffle" : "");
 
       window.navigator.clipboard.writeText(url).then(() => {
         console.log("wrote to clipboard: " + url);
@@ -377,6 +413,19 @@ class App extends Component {
     } else {
       this.failure('Couldn\'t copy to clipboard!');
     }
+  }
+
+  toggleShuffle = () => {
+    this.setState({shuffle: !this.state.shuffle}, () => {
+      if(this.state.shuffle) {
+        let activeQueue = this.getActiveQueue(this.state.mode);
+        let copy = this.state[activeQueue].slice();
+        let shuffled = this.shuffle(copy);
+        this.setState({
+          [activeQueue]: shuffled
+        })
+      }
+    });
   }
 }
 

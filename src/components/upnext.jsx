@@ -6,11 +6,19 @@ class UpNext extends Component {
     state = {  }
     render() {
 
-        
         return (
             <div className="upNext">
                 <h1>Up Next:</h1>
                 <p className="copy" onClick={this.props.copy}>Copy link to queue <span className="material-icons">content_copy</span></p>
+                <div className="shuffle">
+                    <p>Shuffle?</p>
+                    <div class="switch">
+                        <label>
+                            <input type="checkbox" checked={this.props.shuffle} onClick={this.props.toggleShuffle} />
+                            <span className="slider round"></span>
+                        </label>
+                    </div>
+                </div>
                 <ul>
                     {this.props.mode === "auto" && this.makeUpNext(this.props.standardQueue)}
                     {this.props.mode === "manual" && this.makeUpNext(this.props.manualQueue)}
