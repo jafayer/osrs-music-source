@@ -41,7 +41,7 @@
 
 body, html {
     font-family: 'Runescape Chat Font Regular',monospace;
-    font-size: 22px;
+    font-size: 19px;
     text-shadow: 1px 1px #000;
     padding: 0;
     margin: 0;
@@ -58,19 +58,79 @@ body {
 }
 
 .player {
-    width: 80%;
-    max-width: 350px;
-    background: url('./img/outer-background.jpg');
+    width: 70%;
+    max-width: 260px;
+    min-width: 235px;
+    background: url('./img/Background.png');
     background-size: 100% 100%;
     margin: 0 auto;
+    margin-top: 50px;
     padding: 15px;
+    position: relative;
 }
 
+.player::before, .player::after {
+    content: '';
+    height: 100%;
+    width: 36px;
+    top: 0;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center;
+    position: absolute;
+    background: url('./img/Pillar.png');
+}
 
+.player::before {
+    left: -24px;
+}
+.player::after {
+    right: -24px;
+}
 .modeSelect {
-    text-align: right;
+    float: right;
+    padding-right: 5px;
 }
-.modeSelect button, .playPause, .button {
+
+.modeSelect::after {
+    clear: both;
+}
+
+.modeSelect button {
+    width: 50px;
+    height: 34px;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    border: none;
+    outline: none;
+}
+
+.modeSelect .auto {
+    background: url('./img/buttons/Auto.png');
+}
+
+.modeSelect .auto.active {
+    background: url('./img/buttons/AutoSelected.png');
+}
+
+.modeSelect .manual {
+    background: url('./img/buttons/Man.png');
+}
+
+.modeSelect .manual.active {
+    background: url('./img/buttons/ManSelected.png');
+}
+
+.modeSelect .loop {
+    background: url('./img/buttons/Loop.png');
+}
+
+.modeSelect .loop.active {
+    background: url('./img/buttons/LoopSelected.png');
+}
+
+
+.playPause, .button {
     background: url('./img/button.png');
     background-size: 100% 100%;
     color: var(--orange);
@@ -85,18 +145,7 @@ body {
     font-size: 25px;
 }
 
-.playPause.loading p {
-    animation-name: spinner;
-    animation-duration: .5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: forwards;
-}
-.modeSelect button:focus {
-    border-style: inset;
-}
-
-.modeSelect button p, .playPause p, .button p {
+.playPause p, .button p {
     padding: 0;
     margin: 0;
     width: 75px;
@@ -105,46 +154,92 @@ body {
     vertical-align: middle;
 }
 
-.modeSelect button.active p {
-    background: #d612126e;
+.playPause.loading p {
+    animation-name: spinner;
+    animation-duration: .5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: forwards;
 }
 
 .playing {
     color: var(--orange);
     margin: 10px auto;
     padding: 0px 15px;
+    padding-top: 10px;
+    line-height: 1.2;
 }
 
 .playing span {
     color: var(--green);
 }
 .songs {
-    background: url('./img/border-background.jpg');
+    background: url('./img/border-background-old.jpg');
     background-size: 100% 100%;
     padding: 12px;
 }
 
 
 .player ul {
-    height: 345px;
+    height: 250px;
     overflow-y: scroll;
     list-style-type: none;
     margin: 0;
-    padding: 15px;   
+    padding: 5px 15px; 
 }
 
+.player ul::-webkit-scrollbar {
+    width: unset;
+}
+
+.player ul::-webkit-scrollbar-track {
+    background: url('./img/scrollbar/track.png');
+    background-size: contain;
+}
+
+.player ul::-webkit-scrollbar-thumb {
+    background: url('./img/scrollbar/thumb.png');
+    background-repeat: no-repeat;
+    height: unset;
+    background-size: contain;
+}
+
+.player ul::-webkit-scrollbar-button:vertical:increment {
+    background: url('./img/scrollbar/decrement.png');
+    background-size: contain;
+}
+
+.player ul::-webkit-scrollbar-button:vertical:decrement {
+    background: url('./img/scrollbar/increment.png');
+    background-size: contain;
+}
+
+.player ul::-webkit-scrollbar-button:horizontal:end:increment,
+.player ul::-webkit-scrollbar-button:horizontal:start:decrement {
+    display: block;
+}
+
+@media only screen and (max-device-width: 687px) {
+
+    .player ul::-webkit-scrollbar-thumb,
+    .player ul::-webkit-scrollbar,
+    .player ul::-webkit-scrollbar-track {
+      display: none;
+    }
+  
+  }
 .player ul a {
     text-decoration: none;
 }
 
 .player ul li {
     margin: 0;
-    padding: 0;
+    padding: 1px 0px;
     color: var(--green);
     cursor: pointer;
 }
 
-.player ul li:hover {
+.player ul li:hover, .player ul li:focus {
     color: var(--white)
 }
 

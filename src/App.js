@@ -71,7 +71,7 @@ class App extends Component {
     console.log(toast);
     toast.success(message, {
       position: "bottom-center",
-      autoClose: 2000,
+      autoClose: 1500,
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
@@ -83,7 +83,7 @@ class App extends Component {
   failure = (message) => {
     toast.error(message, {
       position: "bottom-center",
-      autoClose: 2000,
+      autoClose: 1500,
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
@@ -150,6 +150,8 @@ class App extends Component {
         document.querySelector(".playPause").focus();
         this.playPause();
         document.querySelector(".playPause").focus();
+      } else if(e.code === 'ArrowRight' && e.ctrlKey) {
+        this.skip();
       }
     });
 
@@ -181,16 +183,20 @@ class App extends Component {
       });
     });
 
+    let shuffleInMatch;
+
     if(this.props.match) {
       let match = this.props.match.params.song.replaceAll("_"," ");
       let song = data.songs.find(i => i.title.toLowerCase() === match.toLowerCase());
       if(song) {
         this.handleClick(null,song);
+      } else if (match.toLowerCase() === "shuffle") {
+        shuffleInMatch = true;
       }
     }
 
     let queryString = new URLSearchParams(this.props.location.search);
-    let isShuffled = queryString.get('shuffle') === "";
+    let isShuffled = (queryString.get('shuffle') === "") || (shuffleInMatch);
 
     if(queryString.get('queue')) {
       let version = queryString.get("v");
@@ -212,7 +218,7 @@ class App extends Component {
       })
     } else {
       if(isShuffled) {
-        let queue = this.shuffle(data.songs);
+        let queue = this.shuffle(data.songs.slice());
 
         this.setState({mode: 'manual', shuffle: isShuffled}, () => {
           this.addToQueue.apply(null, queue);
@@ -378,7 +384,7 @@ class App extends Component {
      [activeQueue]: queue 
     }, () => {
       if('vibrate' in window.navigator) {
-        window.navigator.vibrate([25,50,25])
+        window.navigator.vibrate([25,50,25]);
       }
     });
   }

@@ -17,13 +17,13 @@ class Player extends Component {
                     <div className="modeSelect">
                         <button 
                             onClick={() => {this.props.modeSelect("auto")}}
-                            className={this.props.mode === "auto" ? "active" : ""}><p>Auto</p></button>
+                            className={"auto " + (this.props.mode === "auto" ? "active" : "")}></button>
                         <button 
                             onClick={() => {this.props.modeSelect("manual")}}
-                            className={this.props.mode === "manual" ? "active": ""}><p>Man</p></button>
+                            className={"manual " + (this.props.mode === "manual" ? "active": "")}></button>
                         <button 
                             onClick={() => {this.props.modeSelect("loop")}}
-                            className={this.props.mode === "loop" ? "active" : ""}><p>Loop</p></button>
+                            className={"loop " + (this.props.mode === "loop" ? "active" : "")}></button>
                     </div>
                     <div className="playing">Playing:<br /><span>
                         {!this.props.playing && "Choose a song!"}
