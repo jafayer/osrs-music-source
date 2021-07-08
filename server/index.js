@@ -1,16 +1,26 @@
 const express = require('express');
 const request = require('request');
-const fsPromises = require('fs').promises;
+const fs = require('fs');
 const xmlParser = require('xml2js').parseString;
 const cors = require('cors');
 const path = require('path');
 
 const app = express();
 app.use(cors());
-app.use(express.static(__dirname + '/build'));
+app.use(express.static('../build'));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname) + '/build/index.html');
+app.get('/:song?', (req, res) => {
+    const indexFile = path.resolve('../build/index.html');
+    fs.readFile(indexFile,'utf8',(err,data) => {
+        if(err) {
+            console.log('Yikes! ',err);
+            res.status(500).send('Yikes, there was an error!');
+        }
+
+        return res.send(
+            data
+        )
+    });
 });
 
 app.get('/files', (req,res) => {
