@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 
 class MediaSession extends Component {
 
@@ -53,13 +53,6 @@ class MediaSession extends Component {
       }
 
     componentDidMount = () => {
-
-        const actionHandlers = [
-            ['play',     this.props.onPlay],
-            ['pause',    this.props.onPause],
-            ['nexttrack',this.props.onNextTrack],
-        ]
-
         
         if(this.HAS_MEDIA_SESSION) {
             this.mediaSession.setActionHandler('play', () => {this.actionHandlerWrapper(this.props.onPlay)});

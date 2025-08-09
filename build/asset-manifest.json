@@ -1,24 +1,21 @@
 {
   "files": {
-    "main.css": "./static/css/main.670aa769.chunk.css",
-    "main.js": "./static/js/main.3dc15a42.chunk.js",
-    "main.js.map": "./static/js/main.3dc15a42.chunk.js.map",
-    "runtime-main.js": "./static/js/runtime-main.e419dd8d.js",
-    "runtime-main.js.map": "./static/js/runtime-main.e419dd8d.js.map",
-    "static/css/2.3f6a4e7d.chunk.css": "./static/css/2.3f6a4e7d.chunk.css",
-    "static/js/2.b2096f20.chunk.js": "./static/js/2.b2096f20.chunk.js",
-    "static/js/2.b2096f20.chunk.js.map": "./static/js/2.b2096f20.chunk.js.map",
+    "main.css": "./static/css/main.750bfad3.css",
+    "main.js": "./static/js/main.9ebc5506.js",
+    "static/media/runescape_chat_font.svg": "./static/media/runescape_chat_font.dd8f01ac49f803dbbd55.svg",
+    "static/media/runescape_chat_font.woff": "./static/media/runescape_chat_font.a17a1dd7dd9b458e05f2.woff",
+    "static/media/Background.png": "./static/media/Background.7b5533caf43933862110.png",
+    "static/media/page-wrap.jpg": "./static/media/page-wrap.6b469c844d1740751acc.jpg",
+    "static/media/gnome.png": "./static/media/gnome.405c3fc05777efb8b15a.png",
+    "static/media/border-background-old.jpg": "./static/media/border-background-old.b20245ce358659d44008.jpg",
+    "static/media/runescape_chat_font.eot?": "./static/media/runescape_chat_font.8f67695ab5b999bd0d5d.eot",
+    "static/media/runescape_chat_font.ttf": "./static/media/runescape_chat_font.1b9d8c1abcec1abcc5ad.ttf",
     "index.html": "./index.html",
-    "static/css/2.3f6a4e7d.chunk.css.map": "./static/css/2.3f6a4e7d.chunk.css.map",
-    "static/css/main.670aa769.chunk.css.map": "./static/css/main.670aa769.chunk.css.map",
-    "static/js/2.b2096f20.chunk.js.LICENSE.txt": "./static/js/2.b2096f20.chunk.js.LICENSE.txt",
-    "static/media/App.css": "./static/media/runescape_chat_font.dd8f01ac.svg"
+    "main.750bfad3.css.map": "./static/css/main.750bfad3.css.map",
+    "main.9ebc5506.js.map": "./static/js/main.9ebc5506.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.e419dd8d.js",
-    "static/css/2.3f6a4e7d.chunk.css",
-    "static/js/2.b2096f20.chunk.js",
-    "static/css/main.670aa769.chunk.css",
-    "static/js/main.3dc15a42.chunk.js"
+    "static/css/main.750bfad3.css",
+    "static/js/main.9ebc5506.js"
   ]
 }

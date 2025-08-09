@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import Player from './components/player';
 import UpNext from './components/upnext';
 import Controls from './components/controls';
@@ -10,64 +11,27 @@ import Instructions from './components/instructions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-class App extends Component {
-  state = {
+function App() {
+  const { song: songParam } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [state, setState] = useState({
     loading: false,
     isPaused: true,
     mode: "auto",
     manualQueue: [],
     standardQueue: [],
     shuffle: false,
-   }
-  render() {
-    return (
-      <div className="wrap">
-        <div>
-          <Player
-            mode={this.state.mode}
-            modeSelect={this.modeSelect}
-            playing={this.state.playing}
-            songs={this.state.songlist}
-            makeSongs={this.makeSongs}
-            handleClick={this.handleClick}
-            addToQueue={this.addToQueue}
-          />
-          <Controls
-            isPaused={this.state.isPaused}
-            playPause={this.playPause}
-            skip={this.skip}
-            loading={this.state.loading}
-          />
-          <UpNext
-            mode={this.state.mode}
-            standardQueue={this.state.standardQueue}
-            manualQueue={this.state.manualQueue}
-            removeFromQueue={this.removeFromQueue}
-            handleClick={this.handleClick}
-            copy={this.copyToClipboard}
-            shuffle={this.state.shuffle}
-            toggleShuffle={this.toggleShuffle}
-          />
-          <Instructions />
-          <ToastContainer />
-        </div>
-        <MediaSession
-          isPaused={this.state.isPaused}
-          audio={this.audio}
-          song={this.state.song && this.state.song}
-          onPlay={this.audio.play}
-          onPause={this.audio.pause}
-          onNextTrack={this.skip}
+    songlist: null,
+    playing: null,
+    song: null,
+  });
 
-        />
-      </div>
-    );
-  }
+  // Create audio instance using useMemo to prevent recreation on every render
+  const audio = useMemo(() => new AudioWrapper(), []);
 
-  // init logic
-  audio = new AudioWrapper();
-
-  success = (message) => {
+  const success = useCallback((message) => {
     console.log(toast);
     toast.success(message, {
       position: "bottom-center",
@@ -77,10 +41,10 @@ class App extends Component {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      });
-  }
+    });
+  }, []);
 
-  failure = (message) => {
+  const failure = useCallback((message) => {
     toast.error(message, {
       position: "bottom-center",
       autoClose: 1500,
@@ -89,19 +53,18 @@ class App extends Component {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      });
-  }
+    });
+  }, []);
 
-  getActiveQueue = (mode) => {
+  const getActiveQueue = useCallback((mode) => {
     let map = {
       manual: 'manualQueue',
       auto: 'standardQueue'
     }
-
     return(map[mode]);
-  }
+  }, []);
 
-  shuffle(array) {
+  const shuffle = useCallback((array) => {
     var currentIndex = array.length, temporaryValue, randomIndex;
   
     // While there remain elements to shuffle...
@@ -118,88 +81,98 @@ class App extends Component {
     }
   
     return array;
-  }
+  }, []);
 
-  componentDidMount = () => {
+  useEffect(() => {
+    let loadedFromUrlChange = false;
 
-    this.audio.audio.onended = this.ended;
+    audio.audio.onended = ended;
 
-    this.setState({
+    setState(prevState => ({
+      ...prevState,
       songlist: data.songs,
       standardQueue: data.queue
-    });
+    }));
 
-    this.props.history.listen((route) => {
-      console.log(this.props.history);
-      let path = route.pathname.split('/')[1];
-      let decoded = path.replaceAll("_"," ");
-      let song = data.songs.find(i => i.title.toLowerCase() === decoded.toLowerCase());
-      if(song) {
-        if(this.state.song) {
-          if(song.title !== this.state.song.title) {
-            this.loadedFromUrlChange = true;
-            this.handleClick(null,song);
+    // Handle route changes for song loading
+    const handleRouteChange = () => {
+      let path = location.pathname.split('/')[1];
+      if (path) {
+        let decoded = path.replaceAll("_"," ");
+        let song = data.songs.find(i => i.title.toLowerCase() === decoded.toLowerCase());
+        if(song) {
+          if(state.song) {
+            if(song.title !== state.song.title) {
+              loadedFromUrlChange = true;
+              handleClick(null,song);
+            }
           }
         }
       }
-    });
+    };
+
+    // Listen for URL changes
+    handleRouteChange();
 
     document.addEventListener('keydown', e => {
       if(e.code === "Space") {
         e.preventDefault();
         document.querySelector(".playPause").focus();
-        this.playPause();
+        playPause();
         document.querySelector(".playPause").focus();
       } else if(e.code === 'ArrowRight' && e.ctrlKey) {
-        this.skip();
+        skip();
       }
     });
 
-    this.audio.audio.addEventListener('play', () => {
-      this.setState({
+    audio.audio.addEventListener('play', () => {
+      setState(prevState => ({
+        ...prevState,
         isPaused: false
-      }, () => {
-        console.log("Playing!");
-      });
+      }));
+      console.log("Playing!");
     });
 
-    this.audio.audio.addEventListener('pause', () => {
-      this.setState({
+    audio.audio.addEventListener('pause', () => {
+      setState(prevState => ({
+        ...prevState,
         isPaused: true
-      }, () => {
-        console.log("Paused!");
-      });
+      }));
+      console.log("Paused!");
     });
 
-    this.audio.audio.addEventListener('canplay', () => {
-      this.setState({song: this.audio.song, loading: false}, () => {
-        document.title = "RuneScape Music Player - " + this.state.song.title;
-        if(!this.loadedFromUrlChange) {
-          this.props.history.push('/' + this.state.song.title.replaceAll(" ","_"));
-        } else {
-          this.loadedFromUrlChange = null;
-        }
-        document.querySelector('.playPause').classList.remove('loading');
-      });
+    audio.audio.addEventListener('canplay', () => {
+      setState(prevState => ({
+        ...prevState,
+        song: audio.song, 
+        loading: false
+      }));
+      
+      document.title = "RuneScape Music Player - " + audio.song.title;
+      if(!loadedFromUrlChange) {
+        navigate('/' + audio.song.title.replaceAll(" ","_"));
+      } else {
+        loadedFromUrlChange = false;
+      }
+      document.querySelector('.playPause').classList.remove('loading');
     });
 
     let shuffleInMatch;
 
-    if(this.props.match) {
-      let match = this.props.match.params.song.replaceAll("_"," ");
+    if(songParam) {
+      let match = songParam.replaceAll("_"," ");
       let song = data.songs.find(i => i.title.toLowerCase() === match.toLowerCase());
       if(song) {
-        this.handleClick(null,song);
+        handleClick(null,song);
       } else if (match.toLowerCase() === "shuffle") {
         shuffleInMatch = true;
       }
     }
 
-    let queryString = new URLSearchParams(this.props.location.search);
+    let queryString = new URLSearchParams(location.search);
     let isShuffled = (queryString.get('shuffle') === "") || (shuffleInMatch);
 
     if(queryString.get('queue')) {
-      let version = queryString.get("v");
       let queue = queryString.get("queue").split(",");
       queue = queue.map(song => song.replaceAll("_"," "));
       let inserts = [];
@@ -210,229 +183,416 @@ class App extends Component {
       });
 
       if(isShuffled) {
-        inserts = this.shuffle(inserts);
+        inserts = shuffle(inserts);
       }
 
-      this.setState({mode: "manual", shuffle: isShuffled}, () => {
-        this.addToQueue.apply(null,inserts);
-      })
+      setState(prevState => ({
+        ...prevState,
+        mode: "manual", 
+        shuffle: isShuffled
+      }));
+      
+      addToQueue(...inserts);
     } else {
       if(isShuffled) {
-        let queue = this.shuffle(data.songs.slice());
+        let queue = shuffle(data.songs.slice());
 
-        this.setState({mode: 'manual', shuffle: isShuffled}, () => {
-          this.addToQueue.apply(null, queue);
-        });
+        setState(prevState => ({
+          ...prevState,
+          mode: 'manual', 
+          shuffle: isShuffled
+        }));
+        
+        addToQueue(...queue);
       }
     }
 
-    console.log("Shuffled? " + this.state.shuffle);
+    console.log("Shuffled? " + state.shuffle);
 
     if('mediasession' in navigator) {
-      navigator.mediaSession.setActionHandler('play', this.playPause);
-      navigator.mediaSession.setActionHandler('pause', this.playPause);
-      navigator.mediaSession.setActionHandler('nexttrack', this.skip);
+      navigator.mediaSession.setActionHandler('play', playPause);
+      navigator.mediaSession.setActionHandler('pause', playPause);
+      navigator.mediaSession.setActionHandler('nexttrack', skip);
     }
-  }
 
-  // file fetching logic
+    // Cleanup function
+    return () => {
+      document.removeEventListener('keydown', () => {});
+    };
+  }, [location.pathname, location.search, songParam, state.song, audio, ended, handleClick, navigate, playPause, skip, shuffle, addToQueue, state.shuffle]);
 
-  addToQueue = (...songs) => {
-
-    let activeQueue = this.getActiveQueue(this.state.mode);
-    let queue = Array.prototype.concat(this.state[activeQueue], songs);
+  const addToQueue = useCallback((...songs) => {
+    let activeQueue = getActiveQueue(state.mode);
+    let queue = Array.prototype.concat(state[activeQueue], songs);
   
-    this.setState({
+    setState(prevState => ({
+      ...prevState,
       [activeQueue]: queue
-    }, () => {
-      if('vibrate' in window.navigator) {
-        window.navigator.vibrate(25);
-      }
-    });
-  }
+    }));
+    
+    if('vibrate' in window.navigator) {
+      window.navigator.vibrate(25);
+    }
+  }, [state.mode, state.manualQueue, state.standardQueue, getActiveQueue]);
 
-  handleClick = (event, song) => {
+  const handleClick = useCallback((event, song) => {
     if(event) { // if handleClick occurred from click event, check if should add to queue
-      if(this.state.mode !== "loop" && (event.ctrlKey || event.metaKey)) { // if ctrl/cmd, add to queue
+      if(state.mode !== "loop" && (event.ctrlKey || event.metaKey)) { // if ctrl/cmd, add to queue
         event.preventDefault();
-        this.addToQueue(song);
-  
+        addToQueue(song);
         return;
       }
     }
 
-    if(this.state.playing) {
-      this.audio.pause();
+    if(state.playing) {
+      audio.pause();
     }
 
     const url = song.url;
     console.log(url);
 
-    this.audio.setSong(song);
+    audio.setSong(song);
     document.querySelector('.playPause').classList.add('loading');
     
-    this.setState({
+    setState(prevState => ({
+      ...prevState,
       playing: song,
       loading: true
-    }, () => {
-      this.audio.play();
-    });
+    }));
 
-  }
+    audio.play();
+  }, [state.mode, state.playing, addToQueue, audio]);
 
-  skip = () => {
-    let activeQueue = this.getActiveQueue(this.state.mode);
-
-    let queue = this.state[activeQueue].slice();
+  const skip = useCallback(() => {
+    let activeQueue = getActiveQueue(state.mode);
+    let queue = state[activeQueue].slice();
 
     if(queue.length === 0) {
-      this.audio.song = null;
-      this.audio.pause();
-      this.setState({
+      audio.song = null;
+      audio.pause();
+      setState(prevState => ({
+        ...prevState,
         isPaused: true
-      });
-
+      }));
       return;
     }
 
     let play = queue.splice(0,1)[0];
-    this.setState({
+    setState(prevState => ({
+      ...prevState,
       [activeQueue]: queue
-    }, () => {
-      this.handleClick(null, play);
-    });
-  }
+    }));
+    
+    handleClick(null, play);
+  }, [state.mode, state.manualQueue, state.standardQueue, getActiveQueue, handleClick, audio]);
 
-  playPause = () => {
-
-    if(this.state.isPaused) {
-      if(this.audio.getSrc() === "" && this.state.mode !== "loop") { // advance to next song if there's a queue and no current track
-
-        let activeQueue = this.getActiveQueue(this.state.mode);
-
-        let queue = this.state[activeQueue].slice();
+  const playPause = useCallback(() => {
+    if(state.isPaused) {
+      if(audio.getSrc() === "" && state.mode !== "loop") { // advance to next song if there's a queue and no current track
+        let activeQueue = getActiveQueue(state.mode);
+        let queue = state[activeQueue].slice();
 
         if(queue.length === 0) { // if queue is empty, break
           return;
         }
 
         let play = queue.splice(0,1)[0];
-        this.setState({
+        setState(prevState => ({
+          ...prevState,
           [activeQueue]: queue
-        }, () => {
-          this.handleClick(null, play);
-        });
+        }));
+        
+        handleClick(null, play);
       }
       
-      this.audio.play();
-
+      audio.play();
     } else {
-      this.audio.pause();
+      audio.pause();
     }
-  }
+  }, [state.isPaused, state.mode, state.manualQueue, state.standardQueue, getActiveQueue, handleClick, audio]);
 
-  // mode logic
-  /* For the purposes of making a more functional audio player,
-  the modes have been adjusted from what they would be in the in-game player:
-
-  Auto: after selected song ends, begins autoplay of pre-selected queue of songs
-  Manual: Allows for manual queues of songs
-  Loop: loops current song as normal*/
-
-  modeSelect = (mode, clicked=true) => {
-
+  const modeSelect = useCallback((mode, clicked=true) => {
     if(mode === "loop") { 
-      this.audio.audio.loop = true;
+      audio.audio.loop = true;
     } else { // make sure loop is false if previously declared
-      this.audio.audio.loop = false;
+      audio.audio.loop = false;
     }
 
-    this.setState({
+    setState(prevState => ({
+      ...prevState,
       mode: mode
-    }, () => {console.log("The mode is currently set to: " + mode)});
-  }
+    }));
+    
+    console.log("The mode is currently set to: " + mode);
+  }, [audio]);
 
-  ended = () => {
-    if(this.state.mode === "loop") {
+  const ended = useCallback(() => {
+    if(state.mode === "loop") {
       return;
     }
 
-    let activeQueue = this.getActiveQueue(this.state.mode);
+    let activeQueue = getActiveQueue(state.mode);
 
-    if(this.state[activeQueue].length === 0) {
-      this.audio.pause();
+    if(state[activeQueue].length === 0) {
+      audio.pause();
       return;   
     }
 
-    let queue = this.state[activeQueue].slice();
+    let queue = state[activeQueue].slice();
     let play = queue.splice(0,1)[0];
-    this.setState({
+    setState(prevState => ({
+      ...prevState,
       [activeQueue]: queue,
-    }, () => {
-      this.handleClick(null, play);
-      this.mediaSessionUpdate(play);
-    });
-  }
+    }));
+    
+    handleClick(null, play);
+    mediaSessionUpdate(play);
+  }, [state.mode, state.manualQueue, state.standardQueue, getActiveQueue, handleClick, audio]);
 
-  removeFromQueue = (i) => {
-    let activeQueue = this.getActiveQueue(this.state.mode);
-
-    let queue = this.state[activeQueue].slice();
+  const removeFromQueue = useCallback((i) => {
+    let activeQueue = getActiveQueue(state.mode);
+    let queue = state[activeQueue].slice();
     queue.splice(i,1);
 
-    this.setState({
-     [activeQueue]: queue 
-    }, () => {
-      if('vibrate' in window.navigator) {
-        window.navigator.vibrate([25,50,25]);
-      }
-    });
-  }
+    setState(prevState => ({
+      ...prevState,
+      [activeQueue]: queue 
+    }));
+    
+    if('vibrate' in window.navigator) {
+      window.navigator.vibrate([25,50,25]);
+    }
+  }, [state.mode, state.manualQueue, state.standardQueue, getActiveQueue]);
 
-  mediaSessionUpdate = (song) => {
+  const mediaSessionUpdate = useCallback((song) => {
     if('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: song.title,
         album: 'RuneScape Original Soundtrack'
       });
     }
-  }
+  }, []);
 
-  copyToClipboard = () => {
+  const copyToClipboard = useCallback(() => {
     if('clipboard' in window.navigator) {
       let baseurl = "https://runetunes.com/";
       let path;
-      if(this.state.playing) {
-        path = this.state.playing.title.replace(' ', '_');
+      if(state.playing) {
+        path = state.playing.title.replace(' ', '_');
       }
-      let queue = this.state[this.getActiveQueue(this.state.mode)].slice();
+      let queue = state[getActiveQueue(state.mode)].slice();
       let resQueue = queue.map(song => song.title.replaceAll(' ','_'));
-      let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "") + (this.state.shuffle ? "&shuffle" : "");
+      let url = baseurl+ (path ? path : "") + (resQueue.length > 0 ? ("?queue="+resQueue.join(",")) : "") + (state.shuffle ? "&shuffle" : "");
 
       window.navigator.clipboard.writeText(url).then(() => {
         console.log("wrote to clipboard: " + url);
         if('vibrate' in window.navigator) {
           window.navigator.vibrate(50,50,50);
-          this.success('Copied to clipboard!');
+          success('Copied to clipboard!');
         }
       });
     } else {
-      this.failure('Couldn\'t copy to clipboard!');
+      failure('Couldn\'t copy to clipboard!');
     }
-  }
+  }, [state.playing, state.manualQueue, state.standardQueue, state.mode, state.shuffle, getActiveQueue, success, failure]);
 
-  toggleShuffle = () => {
-    this.setState({shuffle: !this.state.shuffle}, () => {
-      if(this.state.shuffle) {
-        let activeQueue = this.getActiveQueue(this.state.mode);
-        let copy = this.state[activeQueue].slice();
-        let shuffled = this.shuffle(copy);
-        this.setState({
-          [activeQueue]: shuffled
-        })
+  const toggleShuffle = useCallback(() => {
+    const newShuffleState = !state.shuffle;
+    setState(prevState => ({
+      ...prevState,
+      shuffle: newShuffleState
+    }));
+    
+    if(newShuffleState) {
+      let activeQueue = getActiveQueue(state.mode);
+      let copy = state[activeQueue].slice();
+      let shuffled = shuffle(copy);
+      setState(prevState => ({
+        ...prevState,
+        [activeQueue]: shuffled
+      }));
+    }
+  }, [state.shuffle, state.mode, state.manualQueue, state.standardQueue, getActiveQueue, shuffle]);
+
+  useEffect(() => {
+    let loadedFromUrlChange = false;
+
+    audio.audio.onended = ended;
+
+    setState(prevState => ({
+      ...prevState,
+      songlist: data.songs,
+      standardQueue: data.queue
+    }));
+
+    // Handle route changes for song loading
+    const handleRouteChange = () => {
+      let path = location.pathname.split('/')[1];
+      if (path) {
+        let decoded = path.replaceAll("_"," ");
+        let song = data.songs.find(i => i.title.toLowerCase() === decoded.toLowerCase());
+        if(song) {
+          if(state.song) {
+            if(song.title !== state.song.title) {
+              loadedFromUrlChange = true;
+              handleClick(null,song);
+            }
+          }
+        }
+      }
+    };
+
+    // Listen for URL changes
+    handleRouteChange();
+
+    document.addEventListener('keydown', e => {
+      if(e.code === "Space") {
+        e.preventDefault();
+        document.querySelector(".playPause").focus();
+        playPause();
+        document.querySelector(".playPause").focus();
+      } else if(e.code === 'ArrowRight' && e.ctrlKey) {
+        skip();
       }
     });
-  }
+
+    audio.audio.addEventListener('play', () => {
+      setState(prevState => ({
+        ...prevState,
+        isPaused: false
+      }));
+      console.log("Playing!");
+    });
+
+    audio.audio.addEventListener('pause', () => {
+      setState(prevState => ({
+        ...prevState,
+        isPaused: true
+      }));
+      console.log("Paused!");
+    });
+
+    audio.audio.addEventListener('canplay', () => {
+      setState(prevState => ({
+        ...prevState,
+        song: audio.song, 
+        loading: false
+      }));
+      
+      document.title = "RuneScape Music Player - " + audio.song.title;
+      if(!loadedFromUrlChange) {
+        navigate('/' + audio.song.title.replaceAll(" ","_"));
+      } else {
+        loadedFromUrlChange = false;
+      }
+      document.querySelector('.playPause').classList.remove('loading');
+    });
+
+    let shuffleInMatch;
+
+    if(songParam) {
+      let match = songParam.replaceAll("_"," ");
+      let song = data.songs.find(i => i.title.toLowerCase() === match.toLowerCase());
+      if(song) {
+        handleClick(null,song);
+      } else if (match.toLowerCase() === "shuffle") {
+        shuffleInMatch = true;
+      }
+    }
+
+    let queryString = new URLSearchParams(location.search);
+    let isShuffled = (queryString.get('shuffle') === "") || (shuffleInMatch);
+
+    if(queryString.get('queue')) {
+      let queue = queryString.get("queue").split(",");
+      queue = queue.map(song => song.replaceAll("_"," "));
+      let inserts = [];
+
+      queue.forEach(song => {
+        let insert = data.songs.find(i => i.title.toLowerCase() === song.toLowerCase());
+        if(insert) inserts.push(insert);
+      });
+
+      if(isShuffled) {
+        inserts = shuffle(inserts);
+      }
+
+      setState(prevState => ({
+        ...prevState,
+        mode: "manual", 
+        shuffle: isShuffled
+      }));
+      
+      addToQueue(...inserts);
+    } else {
+      if(isShuffled) {
+        let queue = shuffle(data.songs.slice());
+
+        setState(prevState => ({
+          ...prevState,
+          mode: 'manual', 
+          shuffle: isShuffled
+        }));
+        
+        addToQueue(...queue);
+      }
+    }
+
+    console.log("Shuffled? " + state.shuffle);
+
+    if('mediasession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', playPause);
+      navigator.mediaSession.setActionHandler('pause', playPause);
+      navigator.mediaSession.setActionHandler('nexttrack', skip);
+    }
+
+    // Cleanup function
+    return () => {
+      document.removeEventListener('keydown', () => {});
+    };
+  }, [location.pathname, location.search, songParam, state.song, audio, ended, handleClick, navigate, playPause, skip, shuffle, addToQueue, state.shuffle]);
+
+  return (
+    <div className="wrap">
+      <div>
+        <Player
+          mode={state.mode}
+          modeSelect={modeSelect}
+          playing={state.playing}
+          songs={state.songlist}
+          makeSongs={(song) => ({ song, handleClick, addToQueue })}
+          handleClick={handleClick}
+          addToQueue={addToQueue}
+        />
+        <Controls
+          isPaused={state.isPaused}
+          playPause={playPause}
+          skip={skip}
+          loading={state.loading}
+        />
+        <UpNext
+          mode={state.mode}
+          standardQueue={state.standardQueue}
+          manualQueue={state.manualQueue}
+          removeFromQueue={removeFromQueue}
+          handleClick={handleClick}
+          copy={copyToClipboard}
+          shuffle={state.shuffle}
+          toggleShuffle={toggleShuffle}
+        />
+        <Instructions />
+        <ToastContainer />
+      </div>
+      <MediaSession
+        isPaused={state.isPaused}
+        audio={audio}
+        song={state.song && state.song}
+        onPlay={audio.play}
+        onPause={audio.pause}
+        onNextTrack={skip}
+      />
+    </div>
+  );
 }
 
  
