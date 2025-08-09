@@ -1,44 +1,42 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 
-class ContextMenu extends Component {
-    state = { }
-    render() {
-        console.log(this.props);
-        return ( 
-            <div className="contextMenu" style={{"top": this.props.y, "left": this.props.x}}>
-                <div className="header">
-                    <p>Choose Option</p>
-                </div>
-                <ul>
-                    <li onClick={(e) => {this.play(e,this.props.song)}}
-                        onContextMenu={(e) => {e.preventDefault()}}
-                    >Play <span>Song</span></li>
-                    <li onClick={(e) => {this.addToQueue(e,this.props.song)}}
-                        onContextMenu={(e) => {e.preventDefault()}}
-                    >Add to queue <span>Song</span></li>
-                </ul>
-            </div>
-         );
-    }
+function ContextMenu({ x, y, song, handleClick, addToQueue, close }) {
     
+    useEffect(() => {
+        document.addEventListener('click', close);
+        
+        return () => {
+            document.removeEventListener('click', close);
+        };
+    }, [close]);
 
-    componentDidMount = () => {
-        document.addEventListener('click', this.props.close);
-    }
-
-    play = (e,song) => {
+    const play = (e, song) => {
         e.preventDefault();
-        this.props.handleClick(null,song);
-    }
+        handleClick(null, song);
+    };
 
-    addToQueue = (e, song) => {
+    const addToQueueHandler = (e, song) => {
         e.preventDefault();
-        this.props.addToQueue(song);
-    }
+        addToQueue(song);
+    };
 
-    componentWillUnmount = () => {
-        document.removeEventListener('click',this.props.close);
-    }
+    console.log({ x, y, song, handleClick, addToQueue, close });
+    
+    return ( 
+        <div className="contextMenu" style={{"top": y, "left": x}}>
+            <div className="header">
+                <p>Choose Option</p>
+            </div>
+            <ul>
+                <li onClick={(e) => {play(e, song)}}
+                    onContextMenu={(e) => {e.preventDefault()}}
+                >Play <span>Song</span></li>
+                <li onClick={(e) => {addToQueueHandler(e, song)}}
+                    onContextMenu={(e) => {e.preventDefault()}}
+                >Add to queue <span>Song</span></li>
+            </ul>
+        </div>
+    );
 }
  
 export default ContextMenu;
