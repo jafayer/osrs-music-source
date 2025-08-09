@@ -1,22 +1,10 @@
-import React, { Component } from 'react';
+import { useEffect } from 'react';
 
-class MediaSession extends Component {
+function MediaSession({ isPaused, audio, song, onPlay, onPause, onNextTrack }) {
+    const HAS_MEDIA_SESSION = window && window.navigator && 'mediaSession' in window.navigator;
+    const mediaSession = HAS_MEDIA_SESSION ? window.navigator.mediaSession : null;
 
-    render() {
-        
-        if(this.HAS_MEDIA_SESSION) {
-            this.updateMetadata();
-            this.mediaSession.playbackState = (this.props.isPaused ? "paused" : "playing");
-            this.updatePositionState();
-            console.log("mediasession status" + this.mediaSession.playbackState);
-        }
-        return ( null);
-    }
-
-    HAS_MEDIA_SESSION = window && window.navigator && 'mediaSession' in window.navigator;
-    mediaSession = this.HAS_MEDIA_SESSION ? window.navigator.mediaSession : null;
-
-    updateMetadata = () => {
+    const updateMetadata = () => {
         if('MediaMetadata' in window && window.MediaMetadata) {
             let mediaMetadata = new window.MediaMetadata({
                 artwork: [
@@ -27,48 +15,52 @@ class MediaSession extends Component {
                     }
                   ],
                 artist: "RuneScape Original Soundtrack",
-                title: this.props.song ? this.props.song.title : "Loading..."
+                title: song ? song.title : "Loading..."
             });
 
-            this.mediaSession.metadata = mediaMetadata;
+            mediaSession.metadata = mediaMetadata;
         }
-    }
+    };
 
-    actionHandlerWrapper(actionHandler) {
+    const actionHandlerWrapper = (actionHandler) => {
         console.log("FASFASF");
         actionHandler();
-        this.updatePositionState();
-    }
+        updatePositionState();
+    };
 
-    updatePositionState() {
-        if ('setPositionState' in this.mediaSession && this.props.song) {
+    const updatePositionState = () => {
+        if ('setPositionState' in mediaSession && song) {
             let positionState = {
-                duration: this.props.audio.audio.duration ? this.props.audio.audio.duration : 0,
-                playbackRate: this.props.audio.audio.playbackRate,
-                position: this.props.audio.audio.duration ? this.props.audio.audio.currentTime : 0
+                duration: audio.audio.duration ? audio.audio.duration : 0,
+                playbackRate: audio.audio.playbackRate,
+                position: audio.audio.duration ? audio.audio.currentTime : 0
             }
             console.log(positionState);
-            this.mediaSession.setPositionState(positionState);
+            mediaSession.setPositionState(positionState);
         }
-      }
+    };
 
-    componentDidMount = () => {
+    useEffect(() => {
+        if(HAS_MEDIA_SESSION) {
+            mediaSession.setActionHandler('play', () => {actionHandlerWrapper(onPlay)});
+            mediaSession.setActionHandler('pause', () => {actionHandlerWrapper(onPause)});
+            mediaSession.setActionHandler('nexttrack', () => {actionHandlerWrapper(onNextTrack)});
 
-        const actionHandlers = [
-            ['play',     this.props.onPlay],
-            ['pause',    this.props.onPause],
-            ['nexttrack',this.props.onNextTrack],
-        ]
-
-        
-        if(this.HAS_MEDIA_SESSION) {
-            this.mediaSession.setActionHandler('play', () => {this.actionHandlerWrapper(this.props.onPlay)});
-            this.mediaSession.setActionHandler('pause', () => {this.actionHandlerWrapper(this.props.onPause)});
-            this.mediaSession.setActionHandler('nexttrack', () => {this.actionHandlerWrapper(this.props.onNextTrack)});
-
-            this.mediaSession.metadata = this.metadata;
+            mediaSession.metadata = undefined;
         }
-    }
+    }, [HAS_MEDIA_SESSION, mediaSession, onPlay, onPause, onNextTrack]);
+
+    // Update media session state when props change
+    useEffect(() => {
+        if(HAS_MEDIA_SESSION) {
+            updateMetadata();
+            mediaSession.playbackState = (isPaused ? "paused" : "playing");
+            updatePositionState();
+            console.log("mediasession status" + mediaSession.playbackState);
+        }
+    }, [HAS_MEDIA_SESSION, mediaSession, isPaused, song, audio]);
+
+    return null;
 }
  
 export default MediaSession;

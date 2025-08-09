@@ -1,96 +1,86 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Song from './song';
 import ContextMenu from './contextmenu';
 
-class Player extends Component {
-    state = { 
-        contextMenu: false
-    }
+function Player({ mode, modeSelect, playing, songs, handleClick, addToQueue }) {
+    const [contextMenu, setContextMenu] = useState(false);
+    const [contextMenuSong, setContextMenuSong] = useState(null);
+    const [x, setX] = useState(null);
+    const [y, setY] = useState(null);
 
-    render() {
-        return ( 
-
-            <>
-                {this.addPopup()}
-
-                <div className="player">
-                    <div className="modeSelect">
-                        <button 
-                            onClick={() => {this.props.modeSelect("auto")}}
-                            className={"auto " + (this.props.mode === "auto" ? "active" : "")}></button>
-                        <button 
-                            onClick={() => {this.props.modeSelect("manual")}}
-                            className={"manual " + (this.props.mode === "manual" ? "active": "")}></button>
-                        <button 
-                            onClick={() => {this.props.modeSelect("loop")}}
-                            className={"loop " + (this.props.mode === "loop" ? "active" : "")}></button>
-                    </div>
-                    <div className="playing">Playing:<br /><span>
-                        {!this.props.playing && "Choose a song!"}
-                        {this.props.playing && this.props.playing.title}
-                    </span></div>
-                    <div className="songs">
-                        <ul>
-                            {this.props.songs && this.props.songs.map(i => this.makeSongs(i))}
-                            {!this.props.songs && "Please wait, loading!"}
-                        </ul>
-                    </div>
-                </div>
-            </>
-         );
-    }
-
-    makeSongs = (song) => {
-        let elem = (
-          <Song 
-            song={song}
-            handleClick={this.props.handleClick}
-            addToQueue={this.props.addToQueue}
-            contextMenu={this.contextMenu}
-          />
+    const makeSongs = (song) => {
+        return (
+            <Song 
+                key={song.id}
+                song={song}
+                handleClick={handleClick}
+                addToQueue={addToQueue}
+                contextMenu={showContextMenu}
+            />
         );
-    
-        return(elem);
-      }
+    };
 
-
-      // contextMenu setup
-      contextMenu = (e,song) => {
+    const showContextMenu = (e, song) => {
         e.preventDefault();
-        this.closeMenu();
-        this.setState({
-            contextMenu: true,
-            contextMenuSong: song,
-            x: e.pageX,
-            y: e.pageY
-        }, () => {
-            this.addPopup();
-        });  
-    }
+        closeMenu();
+        setContextMenu(true);
+        setContextMenuSong(song);
+        setX(e.pageX);
+        setY(e.pageY);
+    };
 
-    addPopup = () => {
-        if(this.state.contextMenu) {
-            let menu = (<ContextMenu
-                x={this.state.x}
-                y={this.state.y}
-                click={this.closeMenu}
-                song={this.state.contextMenuSong}
-                handleClick={this.props.handleClick}
-                addToQueue={this.props.addToQueue}
-                close={this.closeMenu}
-            />);
-            return(menu)
+    const closeMenu = () => {
+        setContextMenu(false);
+        setX(null);
+        setY(null);
+        setContextMenuSong(null);
+    };
+
+    const addPopup = () => {
+        if(contextMenu) {
+            return (
+                <ContextMenu
+                    x={x}
+                    y={y}
+                    song={contextMenuSong}
+                    handleClick={handleClick}
+                    addToQueue={addToQueue}
+                    close={closeMenu}
+                />
+            );
         }
-    }
+        return null;
+    };
 
-    closeMenu = () => {
-        this.setState({
-            contextMenu: false,
-            x: null,
-            y: null
-        });
-    }
+    return ( 
+        <>
+            {addPopup()}
 
+            <div className="player">
+                <div className="modeSelect">
+                    <button 
+                        onClick={() => {modeSelect("auto")}}
+                        className={"auto " + (mode === "auto" ? "active" : "")}></button>
+                    <button 
+                        onClick={() => {modeSelect("manual")}}
+                        className={"manual " + (mode === "manual" ? "active": "")}></button>
+                    <button 
+                        onClick={() => {modeSelect("loop")}}
+                        className={"loop " + (mode === "loop" ? "active" : "")}></button>
+                </div>
+                <div className="playing">Playing:<br /><span>
+                    {!playing && "Choose a song!"}
+                    {playing && playing.title}
+                </span></div>
+                <div className="songs">
+                    <ul>
+                        {songs && songs.map(song => makeSongs(song))}
+                        {!songs && "Please wait, loading!"}
+                    </ul>
+                </div>
+            </div>
+        </>
+    );
 }
  
 export default Player;

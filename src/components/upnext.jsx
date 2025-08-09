@@ -1,48 +1,23 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Swipe from 'react-easy-swipe';
 
-
-class UpNext extends Component {
-    state = {  }
-    render() {
-
-        return (
-            <div className="upNext">
-                <h1>Up Next:</h1>
-                <p className="copy" onClick={this.props.copy}>Copy link to queue <span className="material-icons">content_copy</span></p>
-                <div className="shuffle">
-                    <p>Shuffle?</p>
-                    <div class="switch">
-                        <label>
-                            <input type="checkbox" checked={this.props.shuffle} onClick={this.props.toggleShuffle} />
-                            <span className="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-                <ul>
-                    {this.props.mode === "auto" && this.makeUpNext(this.props.standardQueue)}
-                    {this.props.mode === "manual" && this.makeUpNext(this.props.manualQueue)}
-                </ul>
-            </div>
-        );
-    }
-
-    makeUpNext = (queue) => {
+function UpNext({ mode, standardQueue, manualQueue, removeFromQueue, handleClick, copy, shuffle, toggleShuffle }) {
+    
+    const makeUpNext = (queue) => {
         let arr = [];
         for(let i = 0; i < queue.length; i++) {
             let elem = (
-                <Swipe onSwipeRight={() => {this.props.removeFromQueue(i)}} tolerance="80">
-                    <li key={i} onClick={(e) => {
+                <Swipe key={i} onSwipeRight={() => {removeFromQueue(i)}} tolerance="80">
+                    <li onClick={(e) => {
                         if(e.ctrlKey || e.metaKey) { // if ctrl/cmd, add to queue
-                            this.props.removeFromQueue(i)
+                            removeFromQueue(i)
                         } else {
                             e.preventDefault();
-                            this.props.handleClick(null,queue[i]);
-                            this.props.removeFromQueue(i)
+                            handleClick(null,queue[i]);
+                            removeFromQueue(i)
                         }
                     }}
-                    
-                    li onContextMenu={(e) => {e.preventDefault(); this.props.removeFromQueue(i)}}>
+                    onContextMenu={(e) => {e.preventDefault(); removeFromQueue(i)}}>
                         {queue[i].title}
                     </li>
                 </Swipe>
@@ -51,8 +26,28 @@ class UpNext extends Component {
             arr.push(elem);
         }
 
-        return(arr);
-    }
+        return arr;
+    };
+
+    return (
+        <div className="upNext">
+            <h1>Up Next:</h1>
+            <p className="copy" onClick={copy}>Copy link to queue <span className="material-icons">content_copy</span></p>
+            <div className="shuffle">
+                <p>Shuffle?</p>
+                <div className="switch">
+                    <label>
+                        <input type="checkbox" checked={shuffle} onChange={toggleShuffle} />
+                        <span className="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <ul>
+                {mode === "auto" && makeUpNext(standardQueue)}
+                {mode === "manual" && makeUpNext(manualQueue)}
+            </ul>
+        </div>
+    );
 }
  
 export default UpNext;
